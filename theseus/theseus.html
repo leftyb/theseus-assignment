@@ -1,0 +1,1425 @@
+<!-- ... existing code ... -->
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Εκπαιδευτική Πύλη: Ο Θησέας</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;600;700&display=swap');
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+    }
+
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Fredoka One', cursive;
+    }
+
+    .custom-btn {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+    }
+    .custom-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #d97706;
+      border-radius: 4px;
+    }
+
+    #sidebar {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .lesson2-maze-widget {
+      --maze-ink: #293044;
+      --maze-gold: #f4c542;
+      --maze-wall: #34445b;
+      --maze-path: #fffdf5;
+      --maze-thread: #d94b43;
+      color: var(--maze-ink);
+      background: linear-gradient(135deg, #f8e8bd, #d8eddf);
+      font-family: Arial, sans-serif;
+    }
+
+    .lesson2-maze-widget .maze-panel {
+      background: #ffffffd9;
+      border: 3px solid #d5a94a;
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 6px 18px #57401d22;
+    }
+
+    .lesson2-maze-widget .maze-info,
+    .lesson2-maze-widget .maze-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+
+    .lesson2-maze-widget .maze-pill {
+      background: #fff1c4;
+      border-radius: 30px;
+      padding: 9px 14px;
+      font-weight: bold;
+    }
+
+    .lesson2-maze-widget .maze-grid {
+      display: grid;
+      grid-template-columns: repeat(15, minmax(0, 1fr));
+      gap: 3px;
+      max-width: 660px;
+      margin: 10px auto;
+      padding: 7px;
+      border-radius: 12px;
+      background: #26364a;
+      touch-action: manipulation;
+    }
+
+    .lesson2-maze-widget .maze-cell {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 1;
+      border-radius: 3px;
+      font-size: clamp(13px, 2.4vw, 25px);
+      font-weight: bold;
+    }
+
+    .lesson2-maze-widget .maze-wall { background: var(--maze-wall); }
+    .lesson2-maze-widget .maze-floor { background: var(--maze-path); }
+    .lesson2-maze-widget .maze-start,
+    .lesson2-maze-widget .maze-player { background: #d9f3d5; }
+    .lesson2-maze-widget .maze-goal { background: #ffe8a3; }
+
+    .lesson2-maze-widget .maze-thread {
+      position: absolute;
+      inset: 0;
+      border-radius: 3px;
+      border: 2px solid #d94b43;
+      background: #e9a09a;
+      opacity: 0.85;
+    }
+
+    .lesson2-maze-widget .maze-actor {
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 1px 1px #fff);
+    }
+
+    .lesson2-maze-widget .maze-message {
+      min-height: 34px;
+      margin: 8px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .lesson2-maze-widget .maze-help {
+      color: #4d5360;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .lesson2-maze-widget .maze-win {
+      color: #18733c;
+      font-size: 23px;
+    }
+
+    .lesson2-maze-widget .maze-overlay {
+      display: none;
+      margin-top: 10px;
+      padding: 12px;
+      border: 2px solid #4a9b59;
+      border-radius: 15px;
+      background: #e5f7df;
+      text-align: center;
+    }
+
+    .lesson2-maze-widget .maze-button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 17px;
+      background: #81502c;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      box-shadow: 0 3px 0 #55351f;
+      cursor: pointer;
+    }
+
+    .lesson2-maze-widget .maze-button:hover { filter: brightness(1.12); }
+    .lesson2-maze-widget .maze-button:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #55351f;
+    }
+
+    @media (max-width: 600px) {
+      .lesson2-maze-widget .maze-panel { padding: 10px; }
+      .lesson2-maze-widget .maze-grid { gap: 2px; padding: 4px; }
+      .lesson2-maze-widget .maze-cell { font-size: 13px; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 relative overflow-x-hidden">
+
+  <!-- TOP BAR WITH 3-BAR HAMBURGER BUTTON (GOOGLE SITES STYLE) -->
+  <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between z-40 sticky top-0 shadow-md">
+    <div class="flex items-center gap-3">
+      <button onclick="toggleSidebar()" aria-label="Εμφάνιση / Απόκρυψη μενού" class="text-amber-400 text-2xl focus:outline-none p-1.5 rounded-xl hover:bg-slate-800 cursor-pointer transition-colors" title="Toggle sidebar">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="flex items-center gap-2 text-amber-400 font-heading text-xl">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Ο Θησέας</span>
+      </div>
+    </div>
+    <div class="text-xs text-slate-400 hidden sm:block">
+      💡 Google Sites UI Mode
+    </div>
+  </header>
+
+  <!-- BACKDROP OVERLAY FOR SIDEBAR DRAWER -->
+  <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-950/70 z-40 hidden backdrop-blur-xs transition-opacity"></div>
+
+  <!-- SIDEBAR NAVIGATION (COLLAPSIBLE DRAWER, GOOGLE SITES STYLE) -->
+  <aside id="sidebar" class="w-80 bg-slate-900 border-r border-slate-800 flex flex-col justify-between overflow-y-auto h-screen fixed inset-y-0 left-0 z-50 -translate-x-full shadow-2xl">
+    <div class="pb-6">
+      <!-- Sidebar Header with Close 'X' Button -->
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2 text-amber-400 font-heading text-lg">
+          <i class="fa-solid fa-compass"></i>
+          <span>Μενού Πλοήγησης</span>
+        </div>
+        <button onclick="toggleSidebar()" aria-label="Κλείσιμο μενού" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-lg cursor-pointer transition-colors">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Navigation Tree with Collapsible Accordions -->
+      <nav class="p-4 space-y-2 text-sm font-medium">
+        
+        <!-- Αρχική σελίδα -->
+        <button onclick="showPage('home'); toggleSidebar();" id="nav-home" class="nav-btn w-full text-left px-3 py-2.5 rounded-xl bg-amber-500 text-slate-950 font-bold flex items-center gap-2.5 transition-all cursor-pointer">
+          <i class="fa-solid fa-house text-base"></i>
+          <span class="text-sm font-bold">Κεντρική / Αρχική</span>
+        </button>
+
+        <!-- Οδηγίες / Ενότητες Accordion Section -->
+        <div class="pt-2">
+          <button onclick="toggleAccordion('acc-learn', 'icon-learn')" class="w-full px-2 py-1.5 text-xs font-bold text-slate-300 hover:text-amber-400 flex items-center justify-between transition-colors cursor-pointer">
+            <div class="flex items-center gap-2">
+              <i id="icon-learn" class="fa-solid fa-caret-down text-slate-400 transition-transform"></i>
+              <i class="fa-solid fa-file text-slate-400"></i>
+              <span>Οδηγός Εκπαιδευτικού</span>
+            </div>
+          </button>
+
+          <div id="acc-learn" class="ml-6 space-y-1 mt-1">
+            <button onclick="showPage('unit1-guide'); toggleSidebar();" id="nav-unit1-guide" class="nav-btn w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 flex items-center gap-2 text-xs cursor-pointer">
+              <i class="fa-solid fa-file text-amber-400"></i>
+              <span>Ενότητα 1 - Οδηγός</span>
+            </button>
+            <button onclick="showPage('unit2-guide'); toggleSidebar();" id="nav-unit2-guide" class="nav-btn w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 flex items-center gap-2 text-xs cursor-pointer">
+              <i class="fa-solid fa-file text-indigo-400"></i>
+              <span>Ενότητα 2 - Οδηγός</span>
+            </button>
+            <button onclick="showPage('unit3-guide'); toggleSidebar();" id="nav-unit3-guide" class="nav-btn w-full text-left px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 flex items-center gap-2 text-xs cursor-pointer">
+              <i class="fa-solid fa-file text-emerald-400"></i>
+              <span>Ενότητα 3 - Οδηγός</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Ανακαλύπτω Accordion Section -->
+        <div class="pt-2">
+          <button onclick="toggleAccordion('acc-discover', 'icon-discover')" class="w-full px-2 py-1.5 text-xs font-bold text-slate-300 hover:text-amber-400 flex items-center justify-between transition-colors cursor-pointer">
+            <div class="flex items-center gap-2">
+              <i id="icon-discover" class="fa-solid fa-caret-down text-slate-400 transition-transform"></i>
+              <i class="fa-solid fa-file text-slate-400"></i>
+              <span>Ανακαλύπτω (Μαθήματα)</span>
+            </div>
+          </button>
+
+          <div id="acc-discover" class="ml-6 space-y-1 mt-1">
+            <button onclick="showPage('lesson1'); toggleSidebar();" id="nav-lesson1" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 flex items-start gap-2 text-xs leading-tight cursor-pointer">
+              <i class="fa-solid fa-file text-amber-400 mt-0.5"></i>
+              <span>ΜΑΘΗΜΑ 1: ΘΗΣΕΑΣ, ΤΟ ΒΑΣΙΛΟΠΟΥΛΟ ΤΗΣ ΤΡΟΙΖΗΝΑΣ</span>
+            </button>
+            <button onclick="showPage('lesson2'); toggleSidebar();" id="nav-lesson2" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 flex items-start gap-2 text-xs leading-tight cursor-pointer">
+              <i class="fa-solid fa-file text-indigo-400 mt-0.5"></i>
+              <span>ΜΑΘΗΜΑ 2: Ο ΘΗΣΕΑΣ ΣΚΟΤΩΝΕΙ ΤΟΝ ΜΙΝΩΤΑΥΡΟ</span>
+            </button>
+            <button onclick="showPage('lesson3'); toggleSidebar();" id="nav-lesson3" class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800 text-slate-300 flex items-start gap-2 text-xs leading-tight cursor-pointer">
+              <i class="fa-solid fa-file text-emerald-400 mt-0.5"></i>
+              <span>ΜΑΘΗΜΑ 3: Ο ΘΗΣΕΑΣ ΕΠΙΣΤΡΕΦΕΙ ΣΤΗΝ ΑΘΗΝΑ</span>
+            </button>
+          </div>
+        </div>
+
+      </nav>
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="p-4 border-t border-slate-800 text-xs text-slate-400 text-center">
+      <p>💡 Σχεδιασμός για Google Sites</p>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="flex-1 p-4 md:p-8 overflow-y-auto max-w-5xl mx-auto w-full">
+
+    <!-- ================= PAGE 1: ΑΡΧΙΚΗ ΣΕΛΙΔΑ ================= -->
+    <section id="page-home" class="page-sec space-y-6">
+      <div class="bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden border-b-4 border-amber-400">
+        <span class="bg-amber-950/60 text-amber-200 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-amber-400/30">
+          Ιστορία Γ' Δημοτικού
+        </span>
+        <h1 class="text-3xl md:text-5xl text-amber-100 font-heading mt-3">
+          Ο Μύθος του Θησέα
+        </h1>
+        <p class="text-amber-100/90 text-sm md:text-base mt-2 max-w-2xl leading-relaxed">
+          Εξερευνήστε τους άθλους, τον Λαβύρινθο της Κρήτης και το ταξίδι της επιστροφής μέσα από διαδραστικές δραστηριότητες και κουίζ.
+        </p>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 sm:p-5 shadow-xl">
+        <video controls playsinline preload="metadata" class="w-full rounded-xl" aria-label="Βίντεο για τον Θησέα">
+          <source src="https://raw.githubusercontent.com/leftyb/theseus-assignment/main/%CE%98%CE%B7%CF%83%CE%B5%CC%81%CE%B1%CF%82.mp4" type="video/mp4">
+          <source src="theseus-intro.mp4" type="video/mp4">
+          Το πρόγραμμα περιήγησής σας δεν υποστηρίζει την αναπαραγωγή βίντεο.
+        </video>
+      </div>
+
+      <!-- Quick Navigation Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div onclick="showPage('lesson1')" class="bg-slate-900 border border-slate-800 hover:border-amber-500/50 p-5 rounded-2xl cursor-pointer transition-all shadow-lg">
+          <div class="text-3xl mb-2">🪨</div>
+          <h3 class="text-lg text-amber-400 font-heading">Μάθημα 1</h3>
+          <p class="text-xs text-slate-300 mt-1">Θησέας, το βασιλόπουλο της Τροιζήνας (Ο Βράχος &amp; ο Δρόμος της Στεριάς).</p>
+        </div>
+        <div onclick="showPage('lesson2')" class="bg-slate-900 border border-slate-800 hover:border-indigo-500/50 p-5 rounded-2xl cursor-pointer transition-all shadow-lg">
+          <div class="text-3xl mb-2">🐂</div>
+          <h3 class="text-lg text-indigo-400 font-heading">Μάθημα 2ο</h3>
+          <p class="text-xs text-slate-300 mt-1">Ο Θησέας σκοτώνει τον Μινώταυρο (Ο Λαβύρινθος &amp; ο Μίτος).</p>
+        </div>
+        <div onclick="showPage('lesson3')" class="bg-slate-900 border border-slate-800 hover:border-emerald-500/50 p-5 rounded-2xl cursor-pointer transition-all shadow-lg">
+          <div class="text-3xl mb-2">⛵</div>
+          <h3 class="text-lg text-emerald-400 font-heading">Μάθημα 3ο</h3>
+          <p class="text-xs text-slate-300 mt-1">Ο Θησέας επιστρέφει στην Αθήνα (Τα Πανιά &amp; το Αιγαίο Πέλαγος).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= UNIT 1 GUIDE ================= -->
+    <section id="page-unit1-guide" class="page-sec hidden space-y-6">
+      <div class="border-b border-slate-800 pb-3">
+        <span class="text-amber-400 text-xs font-bold uppercase tracking-wider">ΟΔΗΓΟΣ ΕΚΠΑΙΔΕΥΤΙΚΟΥ</span>
+        <h2 class="text-2xl sm:text-3xl text-amber-400 font-heading mt-1">
+          Μάθημα 1: Ο Θησέας, το βασιλόπουλο της Τροιζήνας
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-slate-900 border border-teal-800/60 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-3 mb-4">
+              <span class="w-10 h-10 rounded-xl bg-teal-950 text-teal-400 border border-teal-800 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-brain"></i>
+              </span>
+              <h3 class="text-lg text-teal-400 font-heading">Στόχοι γνωστικού αντικειμένου</h3>
+            </div>
+            <ol class="space-y-4 text-sm text-slate-200 list-decimal list-inside leading-relaxed">
+              <li>Να γνωρίζουν την καταγωγή του Θησέα.</li>
+              <li>Να κατανοήσουν τη συμφωνία της Αίθρας με τον Αιγέα και τι συμβολίζει.</li>
+              <li>Να κατανοήσουν την επιλογή του επικίνδυνου δρόμου από τη στεριά και όχι με καράβι για να πάει στην Αθήνα.</li>
+              <li>Να εντοπίζουν στον χάρτη της Ελλάδας τις δύο βασικές τοποθεσίες της ενότητας (Τροιζήνα και Αθήνα).</li>
+              <li>Να γνωρίσουν τα κατορθώματα του Θησέα.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 border border-amber-800/60 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-3 mb-4">
+              <span class="w-10 h-10 rounded-xl bg-amber-950 text-amber-400 border border-amber-800 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-laptop-code"></i>
+              </span>
+              <h3 class="text-lg text-amber-400 font-heading">Στόχοι ΤΠΕ</h3>
+            </div>
+            <ol class="space-y-4 text-sm text-slate-200 list-decimal list-inside leading-relaxed">
+              <li>Να προσεγγίσουν τις ΤΠΕ ως εργαλεία και πηγές μάθησης.</li>
+              <li>Να εξοικειωθούν με τη χρήση εκπαιδευτικών λογισμικών γενικής χρήσης και περιβαλλόντων μάθησης που θα επιτρέψουν να ανακαλύψουν, να κατανοήσουν και να εμπεδώσουν τη νέα γνώση αναπτύσσοντας την κριτική σκέψη.</li>
+              <li>Να προσεγγίσουν το ιστορικό υλικό μέσω Η/Υ παρέχοντας ευκολότερη πρόσβαση σε εικόνες και κείμενα.</li>
+              <li>Να διατυπώσουν υποθέσεις και με τις διάφορες δραστηριότητες να αξιολογήσουν τις ιστορικές πηγές.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-4">
+        <button onclick="showPage('lesson1')" class="custom-btn bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm flex items-center gap-2 cursor-pointer shadow-lg">
+          Μετάβαση στο Μάθημα 1 <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= UNIT 2 GUIDE ================= -->
+    <section id="page-unit2-guide" class="page-sec hidden space-y-6">
+      <div class="border-b border-slate-800 pb-3">
+        <span class="text-amber-400 text-xs font-bold uppercase tracking-wider">ΟΔΗΓΟΣ ΕΚΠΑΙΔΕΥΤΙΚΟΥ</span>
+        <h2 class="text-2xl sm:text-3xl text-amber-400 font-heading mt-1">
+          Μάθημα 2ο: Ο Θησέας σκοτώνει τον Μινώταυρο
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-slate-900 border border-teal-800/60 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-3 mb-4">
+              <span class="w-10 h-10 rounded-xl bg-teal-950 text-teal-400 border border-teal-800 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-brain"></i>
+              </span>
+              <h3 class="text-lg text-teal-400 font-heading">Στόχοι γνωστικού αντικειμένου</h3>
+            </div>
+            <ol class="space-y-4 text-sm text-slate-200 list-decimal list-inside leading-relaxed">
+              <li>Να αξιολογήσουν τον χαρακτήρα του Θησέα και την απόφασή του να πάει ο ίδιος στην Κρήτη.</li>
+              <li>Να μάθουν τι φόρο πλήρωναν οι Αθηναίοι στον Μίνωα.</li>
+              <li>Να κατανοήσουν τη σημασία των άσπρων-μαύρων πανιών του πλοίου.</li>
+              <li>Να εκτιμήσουν τον ρόλο του βοηθού-συμπαραστάτη, που έχει η Αριάδνη.</li>
+              <li>Να κατανοήσουν όρους όπως λαβύρινθος, μίτος της Αριάδνης.</li>
+              <li>Να συνδέσουν τον μύθο του λαβύρινθου με το πολύπλοκο μινωικό ανάκτορο της Κνωσού.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 border border-amber-800/60 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-3 mb-4">
+              <span class="w-10 h-10 rounded-xl bg-amber-950 text-amber-400 border border-amber-800 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-laptop-code"></i>
+              </span>
+              <h3 class="text-lg text-amber-400 font-heading">Στόχοι ΤΠΕ</h3>
+            </div>
+            <ol class="space-y-4 text-sm text-slate-200 list-decimal list-inside leading-relaxed">
+              <li>Να προσεγγίσουν τις ΤΠΕ ως εργαλεία και πηγές μάθησης.</li>
+              <li>Να εξοικειωθούν με τη χρήση εκπαιδευτικών λογισμικών γενικής χρήσης και περιβαλλόντων μάθησης που θα επιτρέψουν να ανακαλύψουν, να κατανοήσουν και να εμπεδώσουν τη νέα γνώση αναπτύσσοντας την κριτική σκέψη.</li>
+              <li>Να προσεγγίσουν το ιστορικό υλικό μέσω Η/Υ, παρέχοντας ευκολότερη πρόσβαση σε εικόνες και κείμενα.</li>
+              <li>Να διατυπώσουν υποθέσεις και με τις διάφορες δραστηριότητες θα μπορέσουν να αναπτύξουν ιστορικές δεξιότητες και μέσω των εικόνων να αξιολογήσουν τις ιστορικές πληροφορίες.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-4">
+        <button onclick="showPage('lesson2')" class="custom-btn bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm flex items-center gap-2 cursor-pointer shadow-lg">
+          Μετάβαση στο Μάθημα 2 <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= UNIT 3 GUIDE ================= -->
+    <section id="page-unit3-guide" class="page-sec hidden space-y-6">
+      <div class="border-b border-slate-800 pb-3">
+        <span class="text-amber-400 text-xs font-bold uppercase tracking-wider">ΟΔΗΓΟΣ ΕΚΠΑΙΔΕΥΤΙΚΟΥ</span>
+        <h2 class="text-2xl sm:text-3xl text-amber-400 font-heading mt-1">
+          Μάθημα 3ο: Ο Θησέας επιστρέφει στην Αθήνα
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-slate-900 border border-teal-800/60 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-3 mb-4">
+              <span class="w-10 h-10 rounded-xl bg-teal-950 text-teal-400 border border-teal-800 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-brain"></i>
+              </span>
+              <h3 class="text-lg text-teal-400 font-heading">Στόχοι γνωστικού αντικειμένου</h3>
+            </div>
+            <ol class="space-y-4 text-sm text-slate-200 list-decimal list-inside leading-relaxed">
+              <li>Να κατανοήσουν τους λόγους που ο Θησέας θεωρείται ο πιο σπουδαίος ήρωας της Αττικής και συνδέθηκε με την ιστορία της.</li>
+              <li>Να μάθουν το τέλος του Αιγέα.</li>
+              <li>Να μάθουν από πού πήρε το Αιγαίο Πέλαγος το όνομά του.</li>
+              <li>Να γνωρίσουν τον μύθο του Δαίδαλου και του Ίκαρου και να τον συνδέσουν με την πρώτη προσπάθεια του ανθρώπου να κυριαρχήσει στον αέρα.</li>
+              <li>Να μάθουν το τέλος του Θησέα.</li>
+              <li>Να κατανοήσουν τι συμβολίζει η μορφή του και ποιο ήταν το σπουδαίο πολιτικό του έργο στην Αθήνα.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 border border-amber-800/60 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-3 mb-4">
+              <span class="w-10 h-10 rounded-xl bg-amber-950 text-amber-400 border border-amber-800 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-laptop-code"></i>
+              </span>
+              <h3 class="text-lg text-amber-400 font-heading">Στόχοι ΤΠΕ</h3>
+            </div>
+            <ol class="space-y-4 text-sm text-slate-200 list-decimal list-inside leading-relaxed">
+              <li>Να προσεγγίσουν τις ΤΠΕ ως εργαλεία και πηγές μάθησης.</li>
+              <li>Να εξοικειωθούν με τη χρήση εκπαιδευτικών λογισμικών γενικής χρήσης και περιβαλλόντων μάθησης που θα επιτρέψουν να ανακαλύψουν, να κατανοήσουν και να εμπεδώσουν τη νέα γνώση αναπτύσσοντας την κριτική σκέψη.</li>
+              <li>Να προσεγγίσουν το ιστορικό υλικό μέσω Η/Υ, παρέχοντας ευκολότερη πρόσβαση σε εικόνες και κείμενα.</li>
+              <li>Να διατυπώσουν υποθέσεις και με τις διάφορες δραστηριότητες να αξιολογήσουν τις ιστορικές πηγές.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-4">
+        <button onclick="showPage('lesson3')" class="custom-btn bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm flex items-center gap-2 cursor-pointer shadow-lg">
+          Μετάβαση στο Μάθημα 3 <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= LESSON 1 ================= -->
+    <section id="page-lesson1" class="page-sec hidden space-y-6">
+      <div class="border-b border-slate-800 pb-3 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <span class="text-amber-400 text-xs font-bold uppercase tracking-wider">Μάθημα 1</span>
+          <h2 class="text-3xl text-amber-400 font-heading mt-1">Ο Θησέας, το βασιλόπουλο της Τροιζήνας</h2>
+        </div>
+        <!-- Lesson 1 Sub-navigation Tabs -->
+        <div class="flex bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs gap-1">
+          <button onclick="switchLesson1Tab('origin')" id="l1-tab-origin" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold transition-all cursor-pointer">
+            1. Κύριο Περιεχόμενο
+          </button>
+          <button onclick="switchLesson1Tab('land')" id="l1-tab-land" class="px-3 py-1.5 rounded-lg hover:bg-slate-700 text-slate-300 transition-all cursor-pointer">
+            2. Ο Δρόμος της Στεριάς
+          </button>
+          <button onclick="switchLesson1Tab('quiz')" id="l1-tab-quiz" class="px-3 py-1.5 rounded-lg hover:bg-slate-700 text-slate-300 transition-all cursor-pointer">
+            3. Αξιολόγηση
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 1: Κύριο Περιεχόμενο & Δραστηριότητα με triz.png -->
+      <div id="l1-content-origin" class="l1-sub-tab space-y-6">
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4 text-sm text-slate-300 leading-relaxed">
+          <p>Ο Θησέας μεγάλωσε στην Τροιζήνα με τη μητέρα του, την Αίθρα. Όταν έγινε παλικάρι, σήκωσε τον βράχο με τεράστια δύναμη και πήρε τα βασιλικά σύμβολα του πατέρα του.</p>
+          
+          <!-- Integrated triz.png -->
+          <div class="w-full rounded-2xl overflow-hidden border border-amber-500/40 shadow-lg mt-3">
+            <img src="https://lh3.googleusercontent.com/d/1koXeeAKoh4mHAGDKZYUC2FjAvKJ9RDDa" alt="Ο Θησέας στην Τροιζήνα" class="w-full h-auto object-cover max-h-[380px]" onerror="this.onerror=null; this.src='https://placehold.co/800x450/1e293b/fbbf24?text=Troezen';">
+            <div class="bg-slate-950 px-4 py-2.5 text-xs text-amber-300/90 border-t border-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-image"></i> <span>Εικόνα 1: Ο Θησέας στην Τροιζήνα αποκαλύπτει τα σανδάλια και το ξίφος.</span>
+            </div>
+          </div>
+          <video controls playsinline preload="metadata" class="w-full rounded-xl border border-amber-500/40 shadow-lg" aria-label="Βίντεο Μαθήματος 1">
+            <source src="https://raw.githubusercontent.com/leftyb/theseus-assignment/main/%CE%98%CE%97%CE%A3%CE%95%CE%91%CE%A3%20-%20%CE%9C%CE%91%CE%98%CE%97%CE%9C%CE%91%201.mp4" type="video/mp4">
+            Το πρόγραμμα περιήγησής σας δεν υποστηρίζει την αναπαραγωγή βίντεο.
+          </video>
+        </div>
+
+        <!-- NEW ROCK LIFTING INTERACTIVE SIMULATION MATCHING EXACT REFERENCE IMAGE -->
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-6 shadow-xl">
+          <div class="text-center max-w-3xl mx-auto space-y-2">
+            <h3 class="text-2xl text-amber-400 font-heading">Δραστηριότητα: Ο Βράχος του Αιγέα</h3>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Πατήστε το κουμπί για να σηκώσετε τον βράχο και να αποκαλύψετε το ξίφος και τα σανδάλια!
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            <div class="lg:col-span-7 bg-slate-950 rounded-2xl p-4 border border-slate-700 flex flex-col items-center">
+              <div class="relative w-full aspect-video bg-slate-900 rounded-xl overflow-hidden border border-slate-800">
+                <canvas id="rockCanvasLesson" class="w-full h-full block cursor-pointer"></canvas>
+              </div>
+              <div class="mt-4 flex gap-3">
+                <button onclick="liftRockAction()" class="custom-btn bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-2.5 rounded-xl text-sm cursor-pointer">
+                  <i class="fa-solid fa-hand-fist mr-1"></i> Σήκωσε τον Βράχο!
+                </button>
+                <button onclick="resetRockAction()" class="custom-btn bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2.5 rounded-xl text-sm cursor-pointer">
+                  Επαναφορά
+                </button>
+              </div>
+            </div>
+
+            <div class="lg:col-span-5 bg-slate-950/60 border border-amber-500/30 rounded-2xl p-5 space-y-4">
+              <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 text-xs sm:text-sm text-slate-300 space-y-3">
+                <h4 class="text-amber-400 font-bold flex items-center gap-2">
+                  <i class="fa-solid fa-key text-amber-500"></i> Τι συμβολίζουν τα αντικείμενα;
+                </h4>
+                <p>🪨 <strong>Ο Βράχος:</strong> Συμβολίζει τη δοκιμασία, τη δύναμη και την ωριμότητα που έπρεπε να αποκτήσει ο Θησέας.</p>
+                <p><svg class="inline-block w-4 h-4 mr-1 align-text-bottom" viewBox="0 0 24 40" aria-hidden="true"><path d="M12 1C6 3 3 12 3 24c0 8 3 14 9 15 6-1 9-7 9-15C21 12 18 3 12 1Z" fill="#a16207" stroke="#fbbf24" stroke-width="1.5"/><path d="M5 18c4 1 10 1 14 0M5 22c4-5 10-5 14 0M12 19v-8" fill="none" stroke="#fde68a" stroke-linecap="round" stroke-width="2"/></svg><strong>Τα Σανδάλια:</strong> Συμβολίζουν την ταυτότητα και τα βήματα του διαδόχου του θρόνου.</p>
+                <p>🗡️ <strong>Το Ξίφος:</strong> Συμβολίζει τη βασιλική καταγωγή, τη γενναιότητα και την προστασία.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Ο Δρόμος της Στεριάς -->
+      <div id="l1-content-land" class="l1-sub-tab hidden space-y-6">
+        <div class="bg-slate-900 border border-slate-800 p-5 sm:p-7 rounded-2xl flex flex-col items-start lg:flex-row lg:items-center justify-between gap-5">
+          <div class="w-full min-w-0 lg:flex-1">
+            <h3 class="text-3xl lg:text-4xl xl:text-5xl text-amber-400 font-heading leading-tight">Τροιζήνα ➔ Αθήνα: Η Επιλογή της Στεριάς</h3>
+            <p lang="el" class="text-lg lg:text-xl xl:text-2xl text-slate-200 mt-3 leading-relaxed">
+              Η μητέρα του, η Αίθρα, και ο παππούς του, ο Πιτθέας, τον συμβούλευσαν να πάει στην Αθήνα με <strong>καράβι</strong>, από τον ασφαλέστερο δρόμο. Ο Θησέας όμως διάλεξε τη <strong>στεριά</strong> για να καθαρίσει τον δρόμο από τους ληστές.
+            </p>
+          </div>
+          <div class="w-full lg:w-80 shrink-0 flex flex-col gap-2">
+            <button id="mapNarrationButton" onclick="toggleMapNarration()" aria-label="Αναπαραγωγή αφήγησης" aria-pressed="false" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-3 sm:px-7 sm:py-4 rounded-xl text-base xl:text-xl flex items-center justify-center gap-3 custom-btn focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-200">
+              <i class="fa-solid fa-volume-high text-xl xl:text-2xl" aria-hidden="true"></i>
+              <span id="mapNarrationLabel">Αφήγηση Θησέα</span>
+            </button>
+            <audio id="mapNarrationAudio" src="https://leftyb.github.io/theseus-assignment/theseus-land-route.wav" preload="metadata"></audio>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6">
+          <div class="bg-slate-950 rounded-2xl p-4 border border-slate-700">
+            <iframe
+              id="landRouteH5P"
+              class="h5p-iframe w-full block border-0 rounded-xl bg-slate-900"
+              src="https://content.e-me-4all.eu/wp-admin/admin-ajax.php?action=h5p_embed&amp;id=125802"
+              width="800"
+              height="600"
+              title="Διαδραστική δραστηριότητα: Ο δρόμος της στεριάς"
+              frameborder="0"
+              allowfullscreen="allowfullscreen"
+              style="height: 600px;"
+            ></iframe>
+            <script src="https://content.e-me-4all.eu/wp-content/plugins/h5p/h5p-php-library/js/h5p-resizer.js" charset="UTF-8"></script>
+            <p class="text-sm sm:text-base text-amber-300 mt-3 text-center leading-relaxed">
+              💡 Επιλέξτε έναν από τους 8 σταθμούς στον χάρτη για να δείτε τα βήματα και τους ληστές που νίκησε ο Θησέας.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: Αξιολόγηση -->
+      <div id="l1-content-quiz" class="l1-sub-tab hidden space-y-6">
+        <div class="bg-slate-900 border border-slate-800 p-4 sm:p-6 rounded-2xl space-y-3">
+          <h3 class="text-xl text-amber-400 font-heading text-center">Διαδραστικό παιχνίδι</h3>
+          <div class="w-full max-w-2xl mx-auto aspect-[25/19]">
+            <iframe
+              src="https://wordwall.net/embed/f95c7c19e7e24043a1b275afb7d16c57?themeId=1&amp;templateId=5&amp;fontStackId=0"
+              title="Διαδραστικό κουίζ Wordwall για τον Θησέα"
+              class="w-full h-full rounded-xl border-0"
+              width="500"
+              height="380"
+              frameborder="0"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 p-4 sm:p-6 rounded-2xl space-y-3">
+          <div class="text-center">
+            <h3 class="text-2xl font-heading text-amber-400">Κουίζ Εμπέδωσης 1ου Μαθήματος</h3>
+            <p class="text-xs text-slate-300 mt-1">Απαντήστε στις παρακάτω ερωτήσεις.</p>
+          </div>
+          <iframe
+            src="https://docs.google.com/forms/d/e/1FAIpQLSdlAomzKarDE5mf6M5z1pnQRuh_q_iG_fUyY4iv-nW46qKb_A/viewform?embedded=true"
+            title="Κουίζ Εμπέδωσης 1ου Μαθήματος"
+            class="w-full max-w-3xl mx-auto block rounded-xl border-0 bg-white"
+            width="640"
+            height="800"
+            frameborder="0"
+            marginheight="0"
+            marginwidth="0"
+          >Φόρτωση φόρμας…</iframe>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-4">
+        <button onclick="showPage('lesson2')" class="custom-btn bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm flex items-center gap-2 cursor-pointer shadow-lg">
+          Επόμενο: Μάθημα 2ο <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= LESSON 2 ================= -->
+    <section id="page-lesson2" class="page-sec hidden space-y-6">
+      <div class="border-b border-slate-800 pb-3 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-3xl text-indigo-400 font-heading mt-1">Ο Θησέας σκοτώνει τον Μινώταυρο</h2>
+        </div>
+        <!-- Lesson 2 Sub-navigation Tabs -->
+        <div class="flex bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs gap-1">
+          <button onclick="switchLesson2Tab('lab')" id="l2-tab-lab" class="px-3 py-1.5 rounded-lg bg-indigo-500 text-slate-950 font-bold transition-all cursor-pointer">
+            1. Κύριο Περιεχόμενο
+          </button>
+          <button onclick="switchLesson2Tab('ariadne')" id="l2-tab-ariadne" class="px-3 py-1.5 rounded-lg hover:bg-slate-700 text-slate-300 transition-all cursor-pointer">
+            2. Το Νήμα της Αριάδνης
+          </button>
+          <button onclick="switchLesson2Tab('quiz')" id="l2-tab-quiz" class="px-3 py-1.5 rounded-lg hover:bg-slate-700 text-slate-300 transition-all cursor-pointer">
+            3. Αξιολόγηση
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 1: Κύριο Περιεχόμενο & Δραστηριότητα με minotavr.png -->
+      <div id="l2-content-lab" class="l2-sub-tab space-y-6">
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4 text-sm text-slate-300 leading-relaxed">
+          <p>Η Αθήνα πλήρωνε βαρύ φόρο αίματος στον βασιλέα Μίνωα της Κρήτης. Ο Θησέας προσφέρθηκε να πάει στην Κρήτη για να λυτρώσει την πόλη του.</p>
+          
+          <!-- Integrated minotavr.png -->
+          <div class="w-full rounded-2xl overflow-hidden border border-indigo-500/40 shadow-lg mt-3">
+            <img src="https://lh3.googleusercontent.com/d/1jrscR45uqguJoU3iqaPQWZtl9WxuuXhI=w1600" alt="Ο Θησέας και ο Μινώταυρος" class="w-full h-auto object-cover max-h-[380px]" onerror="this.onerror=null; this.src='https://placehold.co/800x450/1e293b/818cf8?text=Minotaur';">
+            <div class="bg-slate-950 px-4 py-2.5 text-xs text-indigo-300/90 border-t border-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-image"></i> <span>Εικόνα 2: Ο Θησέας στον Λαβύρινθο της Κρήτης.</span>
+            </div>
+          </div>
+          <div class="w-full aspect-video rounded-xl overflow-hidden border border-indigo-500/40 shadow-lg">
+            <iframe src="https://drive.google.com/file/d/1pz5AZQfYixVHew-zlMddmbtExHBxyv-H/preview" title="Βίντεο Μαθήματος 2: Ο Θησέας" class="w-full h-full" allow="autoplay" allowfullscreen></iframe>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 2: Το Νήμα της Αριάδνης -->
+      <div id="l2-content-ariadne" class="l2-sub-tab hidden space-y-6">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4 shadow-lg">
+          <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+            <span class="text-3xl">🧶</span>
+            <h3 class="text-2xl text-indigo-400 font-heading">Ο Μίτος της Αριάδνης</h3>
+          </div>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            Η Αριάδνη, η κόρη του βασιλέα Μίνωα, ερωτεύτηκε τον γενναίο Θησέα. Δίνοντάς του ένα κουβάρι με χρυσό νήμα (τον Μίτο), του έδωσε τη δυνατότητα να βρει τον δρόμο της επιστροφής από τον δαιδαλώδη λαβύρινθο.
+          </p>
+          <button id="ariadneNarrationButton" type="button" onclick="toggleAriadneNarration()" aria-label="Αναπαραγωγή αφήγησης" aria-pressed="false" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-3 rounded-xl text-base flex items-center justify-center gap-3 custom-btn focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-200">
+            <i class="fa-solid fa-volume-high text-xl" aria-hidden="true"></i>
+            <span id="ariadneNarrationLabel">Αφήγηση: Ο Μίτος της Αριάδνης</span>
+          </button>
+          <audio id="ariadneNarrationAudio" src="theseus-ariadne-thread.wav" preload="metadata"></audio>
+        </div>
+        <section class="lesson2-maze-widget rounded-2xl p-3 sm:p-5 shadow-xl" aria-labelledby="lesson2-maze-title">
+          <header class="text-center mb-4">
+            <div class="text-4xl" aria-hidden="true">🏛️ 🧵 🏺</div>
+            <h3 id="lesson2-maze-title" class="text-3xl text-[#783f19] font-bold mt-1">Ο Θησέας και ο Λαβύρινθος</h3>
+            <p class="text-base sm:text-lg mt-2">Βοήθησε τον Θησέα να βρει την έξοδο με τον μίτο της Αριάδνης!</p>
+          </header>
+          <div class="maze-panel">
+            <div class="maze-info">
+              <span class="maze-pill">🧑 Αποστολή: Βρες την έξοδο!</span>
+              <span class="maze-pill">👣 Βήματα: <span id="lesson2MazeSteps">0</span></span>
+              <span class="maze-pill">🧵 Ο μίτος αφήνει ίχνος!</span>
+            </div>
+            <div id="lesson2MazeGrid" class="maze-grid focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#81502c]" role="grid" aria-label="Λαβύρινθος" tabindex="0"></div>
+            <p class="maze-help">Ο μίτος της Αριάδνης αφήνει κόκκινο ίχνος από όπου περνά ο Θησέας. Βρες μόνος σου τη διαδρομή προς την πύλη!</p>
+            <div id="lesson2MazeMessage" class="maze-message" aria-live="polite">Χρησιμοποίησε τα βελάκια του πληκτρολογίου για να κινήσεις τον Θησέα.</div>
+            <div id="lesson2MazeOverlay" class="maze-overlay">
+              <div class="maze-win">🎉 Τα κατάφερες, ήρωα!</div>
+              <p>Ο Θησέας βγήκε από τον λαβύρινθο! Ο μίτος της Αριάδνης τον βοήθησε να μη χαθεί.</p>
+              <button type="button" class="maze-button" data-maze-restart>🔄 Παίξε ξανά</button>
+            </div>
+            <div class="maze-controls">
+              <button type="button" class="maze-button" data-maze-move="0,-1" aria-label="Πάνω">⬆️</button>
+            </div>
+            <div class="maze-controls">
+              <button type="button" class="maze-button" data-maze-move="-1,0" aria-label="Αριστερά">⬅️</button>
+              <button type="button" class="maze-button" data-maze-move="0,1" aria-label="Κάτω">⬇️</button>
+              <button type="button" class="maze-button" data-maze-move="1,0" aria-label="Δεξιά">➡️</button>
+            </div>
+            <div class="maze-controls">
+              <button type="button" class="maze-button" data-maze-restart>🔄 Ξεκίνα από την αρχή</button>
+            </div>
+            <p class="maze-help">Υπολογιστής: βελάκια ή W A S D · Μπορείς επίσης να πατήσεις τα κουμπιά.</p>
+          </div>
+        </section>
+      </div>
+
+      <!-- TAB 3: Αξιολόγηση -->
+      <div id="l2-content-quiz" class="l2-sub-tab hidden space-y-6">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-6 max-w-2xl mx-auto">
+          <div class="text-center">
+            <span class="bg-indigo-500/20 text-indigo-300 text-xs font-bold px-3 py-1 rounded-full border border-indigo-500/30">
+              📝 Υποσελίδα Αξιολόγησης
+            </span>
+            <h3 class="text-2xl font-heading text-indigo-400 mt-2">Κουίζ Εμπέδωσης 2ου Μαθήματος</h3>
+            <p class="text-xs text-slate-300 mt-1">Απαντήστε στις ερωτήσεις για τον Μινώταυρο.</p>
+          </div>
+          <div id="lesson2QuizBox" class="space-y-6"></div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-4">
+        <button onclick="showPage('lesson3')" class="custom-btn bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm flex items-center gap-2 cursor-pointer shadow-lg">
+          Επόμενο: Μάθημα 3ο <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= LESSON 3 ================= -->
+    <section id="page-lesson3" class="page-sec hidden space-y-6">
+      <div class="border-b border-slate-800 pb-3 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <span class="text-emerald-400 text-xs font-bold uppercase tracking-wider">Μάθημα 3ο</span>
+          <h2 class="text-3xl text-emerald-400 font-heading mt-1">Ο Θησέας επιστρέφει στην Αθήνα</h2>
+        </div>
+        <!-- Lesson 3 Sub-navigation Tabs -->
+        <div class="flex bg-slate-800 p-1 rounded-xl border border-slate-700 text-xs gap-1">
+          <button onclick="switchLesson3Tab('icarus')" id="l3-tab-icarus" class="px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 font-bold transition-all cursor-pointer">
+            1. Κύριο Περιεχόμενο
+          </button>
+          <button onclick="switchLesson3Tab('sails')" id="l3-tab-sails" class="px-3 py-1.5 rounded-lg hover:bg-slate-700 text-slate-300 transition-all cursor-pointer">
+            2. Η Επιστροφή &amp; ο Αιγέας
+          </button>
+          <button onclick="switchLesson3Tab('quiz')" id="l3-tab-quiz" class="px-3 py-1.5 rounded-lg hover:bg-slate-700 text-slate-300 transition-all cursor-pointer">
+            3. Αξιολόγηση
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 1: Κύριο Περιεχόμενο & Δραστηριότητα με ship.png -->
+      <div id="l3-content-icarus" class="l3-sub-tab space-y-6">
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4 text-sm text-slate-300 leading-relaxed">
+          <h3 class="text-xl text-emerald-400 font-heading">Τα Μαύρα &amp; Λευκά Πανιά - Η Επιστροφή</h3>
+          <p>Ο βασιλιάς Αιγέας περίμενε αγωνιωδώς στο Σούνιο. Βλέποντας τα μαύρα πανιά να πλησιάζουν, νόμισε πως ο γιος του χάθηκε και έπεσε στη θάλασσα.</p>
+          
+          <!-- Integrated ship.png -->
+          <div class="w-full rounded-2xl overflow-hidden border border-emerald-500/40 shadow-lg mt-3">
+            <img src="https://lh3.googleusercontent.com/d/1mQDPj9vqw5LIuKLJfbc0KV3bJVUyvGu3" alt="Η επιστροφή του Θησέα στην Αθήνα" class="w-full h-auto object-cover max-h-[380px]" onerror="this.onerror=null; this.src='https://placehold.co/800x450/1e293b/34d399?text=Return';">
+            <div class="bg-slate-950 px-4 py-2.5 text-xs text-emerald-300/90 border-t border-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-image"></i> <span>Εικόνα 3: Η επιστροφή του Θησέα στην Αθήνα με το πλοίο.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 border border-emerald-500/30 p-6 rounded-2xl space-y-4 shadow-lg">
+          <h3 class="text-xl text-emerald-400 font-heading">Δραστηριότητα: Ο Μύθος του Δαιδάλου &amp; του Ίκαρου</h3>
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 text-sm">
+            <p class="font-bold text-amber-200">Γιατί έπεσε ο Ίκαρος στη θάλασσα;</p>
+            <button onclick="checkIcarusAns(true)" class="w-full text-left p-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors cursor-pointer">
+              A) Πέταξε πολύ κοντά στον ήλιο, το κερί έλιωσε και τα φτερά χάθηκαν.
+            </button>
+            <button onclick="checkIcarusAns(false)" class="w-full text-left p-3 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors cursor-pointer">
+              B) Τον χτύπησε δυνατός άνεμος και του έσπασε τα πανιά.
+            </button>
+            <div id="icarusRes" class="hidden p-3 rounded-lg font-bold text-xs"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Η Επιστροφή & ο Αιγέας -->
+      <div id="l3-content-sails" class="l3-sub-tab hidden space-y-6">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4 shadow-lg">
+          <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+            <span class="text-3xl">⛵</span>
+            <h3 class="text-2xl text-emerald-400 font-heading">Η Θλίψη του Αιγέα &amp; το Αιγαίο Πέλαγος</h3>
+          </div>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            Από τη μεγάλη του θλίψη, ο Αιγέας έπεσε στη θάλασσα και πνίγηκε. Έκτοτε, η θάλασσα αυτή ονομάζεται <strong>Αιγαίο Πέλαγος</strong> προς τιμήν του.
+          </p>
+        </div>
+      </div>
+
+      <!-- TAB 3: Αξιολόγηση -->
+      <div id="l3-content-quiz" class="l3-sub-tab hidden space-y-6">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-6 max-w-2xl mx-auto">
+          <div class="text-center">
+            <span class="bg-emerald-500/20 text-emerald-300 text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/30">
+              📝 Υποσελίδα Αξιολόγησης
+            </span>
+            <h3 class="text-2xl font-heading text-emerald-400 mt-2">Κουίζ Εμπέδωσης 3ου Μαθήματος</h3>
+            <p class="text-xs text-slate-300 mt-1">Απαντήστε στις ερωτήσεις για την επιστροφή.</p>
+          </div>
+          <div id="lesson3QuizBox" class="space-y-6"></div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-4">
+        <button onclick="showPage('home')" class="custom-btn bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm flex items-center gap-2 cursor-pointer shadow-lg">
+          Επιστροφή στην Κεντρική <i class="fa-solid fa-house"></i>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- CUSTOM MODAL INSTEAD OF ALERT -->
+  <div id="customModal" class="fixed inset-0 bg-slate-950/80 z-50 hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border-2 border-amber-500/50 rounded-2xl p-6 max-w-md w-full shadow-2xl text-center space-y-4">
+      <div id="modalIcon" class="text-4xl text-amber-400">ℹ️</div>
+      <h3 id="modalTitle" class="text-xl font-heading text-amber-300">Μήνυμα</h3>
+      <p id="modalMsg" class="text-sm text-slate-200 leading-relaxed"></p>
+      <button onclick="closeModal()" class="custom-btn bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-6 py-2 rounded-xl text-sm cursor-pointer">
+        Εντάξει
+      </button>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC (GLOBALLY ATTACHED FUNCTIONS) -->
+  <script>
+    let activePageId = 'home';
+    let isRockLiftedLesson = false;
+
+    window.showModal = function(title, msg, icon = "ℹ️") {
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalMsg').innerText = msg;
+      document.getElementById('modalIcon').innerText = icon;
+      document.getElementById('customModal').classList.remove('hidden');
+      document.getElementById('customModal').classList.add('flex');
+    };
+
+    window.closeModal = function() {
+      document.getElementById('customModal').classList.add('hidden');
+      document.getElementById('customModal').classList.remove('flex');
+    };
+
+    window.toggleAccordion = function(contentId, iconId) {
+      const content = document.getElementById(contentId);
+      const icon = document.getElementById(iconId);
+      if (content) content.classList.toggle('hidden');
+      if (icon) icon.classList.toggle('rotate-180');
+    };
+
+    window.toggleSidebar = function() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      if (sidebar) {
+        sidebar.classList.toggle('-translate-x-full');
+      }
+      if (overlay) {
+        overlay.classList.toggle('hidden');
+      }
+    };
+
+    window.showPage = function(pageId) {
+      document.querySelectorAll('.page-sec').forEach(el => el.classList.add('hidden'));
+
+      const target = document.getElementById(`page-${pageId}`);
+      if (target) {
+        target.classList.remove('hidden');
+        activePageId = pageId;
+      }
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-amber-500', 'text-slate-950', 'font-bold');
+        btn.classList.add('hover:bg-slate-800', 'text-slate-200');
+      });
+
+      const activeNav = document.getElementById(`nav-${pageId}`);
+      if (activeNav) {
+        activeNav.classList.add('bg-amber-500', 'text-slate-950', 'font-bold');
+      }
+
+      if (pageId === 'lesson1') {
+        switchLesson1Tab('origin');
+        setTimeout(() => {
+          drawRockSceneLesson();
+        }, 150);
+      }
+      if (pageId === 'lesson2') {
+        switchLesson2Tab('lab');
+      }
+      if (pageId === 'lesson3') {
+        switchLesson3Tab('icarus');
+      }
+    };
+
+    window.switchLesson1Tab = function(tabKey) {
+      document.querySelectorAll('#page-lesson1 .l1-sub-tab').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById(`l1-content-${tabKey}`);
+      if (target) target.classList.remove('hidden');
+
+      ['origin', 'land', 'quiz'].forEach(k => {
+        const btn = document.getElementById(`l1-tab-${k}`);
+        if (btn) {
+          if (k === tabKey) {
+            btn.className = "px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold transition-all cursor-pointer";
+          } else {
+            btn.className = "px-3 py-1.5 rounded-lg hover:bg-slate-700 text-slate-300 transition-all cursor-pointer";
+          }
+        }
+      });
+
+    };
+
+    window.switchLesson2Tab = function(tabKey) {
+      if (tabKey !== 'ariadne') window.stopAriadneNarration();
+      document.querySelectorAll('#page-lesson2 .l2-sub-tab').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById(`l2-content-${tabKey}`);
+      if (target) target.classList.remove('hidden');
+
+      ['lab', 'ariadne', 'quiz'].forEach(k => {
+        const btn = document.getElementById(`l2-tab-${k}`);
+        if (btn) {
+          if (k === tabKey) {
+            btn.className = "px-3 py-1.5 rounded-lg bg-indigo-500 text-slate-950 font-bold transition-all cursor-pointer";
+          } else {
+            btn.className = "px-3 py-1.5 rounded-lg hover:bg-slate-700 text-slate-300 transition-all cursor-pointer";
+          }
+        }
+      });
+
+      if (tabKey === 'lab') setTimeout(initializeLesson2Maze, 100);
+      if (tabKey === 'quiz') renderLesson2Quiz();
+    };
+
+    window.switchLesson3Tab = function(tabKey) {
+      document.querySelectorAll('#page-lesson3 .l3-sub-tab').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById(`l3-content-${tabKey}`);
+      if (target) target.classList.remove('hidden');
+
+      ['icarus', 'sails', 'quiz'].forEach(k => {
+        const btn = document.getElementById(`l3-tab-${k}`);
+        if (btn) {
+          if (k === tabKey) {
+            btn.className = "px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 font-bold transition-all cursor-pointer";
+          } else {
+            btn.className = "px-3 py-1.5 rounded-lg hover:bg-slate-700 text-slate-300 transition-all cursor-pointer";
+          }
+        }
+      });
+
+      if (tabKey === 'quiz') renderLesson3Quiz();
+    };
+
+    window.drawRockSceneLesson = function() {
+      const cvs = document.getElementById('rockCanvasLesson');
+      if (!cvs) return;
+      const ctx = cvs.getContext('2d');
+      const rect = cvs.getBoundingClientRect();
+      cvs.width = rect.width;
+      cvs.height = rect.height;
+
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(0, 0, cvs.width, cvs.height * 0.7);
+      ctx.fillStyle = "#78350f";
+      ctx.fillRect(0, cvs.height * 0.7, cvs.width, cvs.height * 0.3);
+
+      ctx.save();
+      ctx.translate(cvs.width * 0.42, cvs.height * 0.75);
+      ctx.scale(0.4, 0.4);
+      ctx.rotate(-0.12);
+      ctx.beginPath();
+      ctx.moveTo(0, -cvs.width * 0.065);
+      ctx.bezierCurveTo(-cvs.width * 0.045, -cvs.width * 0.055, -cvs.width * 0.055, cvs.width * 0.025, -cvs.width * 0.03, cvs.width * 0.055);
+      ctx.quadraticCurveTo(0, cvs.width * 0.07, cvs.width * 0.03, cvs.width * 0.055);
+      ctx.bezierCurveTo(cvs.width * 0.055, cvs.width * 0.025, cvs.width * 0.045, -cvs.width * 0.055, 0, -cvs.width * 0.065);
+      ctx.fillStyle = "#a16207";
+      ctx.strokeStyle = "#fbbf24";
+      ctx.lineWidth = Math.max(2, cvs.width * 0.004);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-cvs.width * 0.04, cvs.width * 0.005);
+      ctx.quadraticCurveTo(0, cvs.width * 0.02, cvs.width * 0.04, cvs.width * 0.005);
+      ctx.moveTo(-cvs.width * 0.035, cvs.width * 0.025);
+      ctx.quadraticCurveTo(0, -cvs.width * 0.005, cvs.width * 0.035, cvs.width * 0.025);
+      ctx.moveTo(0, cvs.width * 0.008);
+      ctx.lineTo(0, -cvs.width * 0.035);
+      ctx.strokeStyle = "#fde68a";
+      ctx.lineWidth = Math.max(3, cvs.width * 0.008);
+      ctx.lineCap = "round";
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.font = `${cvs.width * 0.08}px serif`;
+      ctx.textAlign = "center";
+      ctx.fillText("🗡️", cvs.width * 0.57, cvs.height * 0.75);
+
+      const rockY = isRockLiftedLesson ? cvs.height * 0.35 : cvs.height * 0.72;
+      ctx.save();
+      ctx.translate(cvs.width * 0.5, rockY);
+      ctx.scale(cvs.width * 0.22, cvs.height * 0.18);
+      ctx.beginPath();
+      ctx.moveTo(-0.88, -0.32);
+      ctx.lineTo(-0.72, -0.76);
+      ctx.lineTo(-0.34, -0.88);
+      ctx.lineTo(-0.08, -0.68);
+      ctx.lineTo(0.28, -0.94);
+      ctx.lineTo(0.58, -0.68);
+      ctx.lineTo(0.91, -0.52);
+      ctx.lineTo(1, -0.08);
+      ctx.lineTo(0.82, 0.28);
+      ctx.lineTo(0.88, 0.62);
+      ctx.lineTo(0.48, 0.82);
+      ctx.lineTo(0.12, 0.72);
+      ctx.lineTo(-0.2, 0.92);
+      ctx.lineTo(-0.52, 0.68);
+      ctx.lineTo(-0.9, 0.58);
+      ctx.lineTo(-0.82, 0.16);
+      ctx.lineTo(-1, -0.08);
+      ctx.closePath();
+
+      const rockGradient = ctx.createLinearGradient(-0.35, -1, 0.3, 1);
+      rockGradient.addColorStop(0, "#94a3b8");
+      rockGradient.addColorStop(0.38, "#64748b");
+      rockGradient.addColorStop(1, "#334155");
+      ctx.fillStyle = rockGradient;
+      ctx.fill();
+      ctx.save();
+      ctx.clip();
+
+      ctx.fillStyle = "rgba(203, 213, 225, 0.2)";
+      ctx.beginPath();
+      ctx.moveTo(-0.88, -0.32);
+      ctx.lineTo(-0.72, -0.76);
+      ctx.lineTo(-0.34, -0.88);
+      ctx.lineTo(-0.22, -0.3);
+      ctx.lineTo(-0.58, 0.08);
+      ctx.lineTo(-0.82, 0.16);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = "rgba(15, 23, 42, 0.22)";
+      ctx.beginPath();
+      ctx.moveTo(-0.22, -0.3);
+      ctx.lineTo(-0.34, -0.88);
+      ctx.lineTo(-0.08, -0.68);
+      ctx.lineTo(0.28, -0.94);
+      ctx.lineTo(0.58, -0.68);
+      ctx.lineTo(0.3, -0.16);
+      ctx.lineTo(0.02, 0.14);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = "rgba(15, 23, 42, 0.28)";
+      ctx.beginPath();
+      ctx.moveTo(0.3, -0.16);
+      ctx.lineTo(0.58, -0.68);
+      ctx.lineTo(0.91, -0.52);
+      ctx.lineTo(1, -0.08);
+      ctx.lineTo(0.82, 0.28);
+      ctx.lineTo(0.88, 0.62);
+      ctx.lineTo(0.48, 0.82);
+      ctx.lineTo(0.2, 0.42);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = "rgba(226, 232, 240, 0.42)";
+      ctx.lineWidth = 0.018;
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(-0.58, -0.68);
+      ctx.lineTo(-0.42, -0.42);
+      ctx.lineTo(-0.5, -0.18);
+      ctx.moveTo(0.12, -0.62);
+      ctx.lineTo(0.04, -0.34);
+      ctx.lineTo(0.22, -0.12);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.strokeStyle = "#1e293b";
+      ctx.lineWidth = 0.035;
+      ctx.lineJoin = "round";
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.font = `${cvs.width * 0.1}px serif`;
+      ctx.fillText(isRockLiftedLesson ? "🏋️‍♂️" : "👦", cvs.width * 0.2, cvs.height * 0.7);
+    };
+
+    window.liftRockAction = function() { isRockLiftedLesson = true; drawRockSceneLesson(); };
+    window.resetRockAction = function() { isRockLiftedLesson = false; drawRockSceneLesson(); };
+
+    const mapNarrationAudio = document.getElementById("mapNarrationAudio");
+    const setMapNarrationState = playing => {
+      const button = document.getElementById("mapNarrationButton");
+      const label = document.getElementById("mapNarrationLabel");
+      if (!button || !label) return;
+      button.setAttribute("aria-pressed", String(playing));
+      button.setAttribute("aria-label", playing ? "Διακοπή αφήγησης" : "Αναπαραγωγή αφήγησης");
+      label.innerText = playing ? "Διακοπή αφήγησης" : "Αφήγηση Θησέα";
+    };
+
+    window.toggleMapNarration = async function() {
+      if (!mapNarrationAudio) return;
+      if (!mapNarrationAudio.paused) {
+        mapNarrationAudio.pause();
+        mapNarrationAudio.currentTime = 0;
+        return;
+      }
+
+      try {
+        await mapNarrationAudio.play();
+      } catch {
+        setMapNarrationState(false);
+        showModal("Η αφήγηση δεν είναι διαθέσιμη", "Δεν ήταν δυνατή η αναπαραγωγή της αφήγησης. Έλεγξε τη σύνδεση του αρχείου στο GitHub Pages.", "🔈");
+      }
+    };
+
+    if (mapNarrationAudio) {
+      mapNarrationAudio.addEventListener("play", () => setMapNarrationState(true));
+      mapNarrationAudio.addEventListener("pause", () => setMapNarrationState(false));
+      mapNarrationAudio.addEventListener("ended", () => setMapNarrationState(false));
+      mapNarrationAudio.addEventListener("error", () => setMapNarrationState(false));
+    }
+
+    const ariadneNarrationAudio = document.getElementById("ariadneNarrationAudio");
+    const setAriadneNarrationState = playing => {
+      const button = document.getElementById("ariadneNarrationButton");
+      const label = document.getElementById("ariadneNarrationLabel");
+      if (!button || !label) return;
+      button.setAttribute("aria-pressed", String(playing));
+      button.setAttribute("aria-label", playing ? "Διακοπή αφήγησης" : "Αναπαραγωγή αφήγησης");
+      label.innerText = playing ? "Διακοπή αφήγησης" : "Αφήγηση: Ο Μίτος της Αριάδνης";
+    };
+
+    window.stopAriadneNarration = function() {
+      if (ariadneNarrationAudio) {
+        ariadneNarrationAudio.pause();
+        ariadneNarrationAudio.currentTime = 0;
+      }
+      setAriadneNarrationState(false);
+    };
+
+    window.toggleAriadneNarration = async function() {
+      if (!ariadneNarrationAudio) return;
+      if (!ariadneNarrationAudio.paused) {
+        window.stopAriadneNarration();
+        return;
+      }
+
+      try {
+        await ariadneNarrationAudio.play();
+      } catch {
+        setAriadneNarrationState(false);
+        showModal("Η αφήγηση δεν είναι διαθέσιμη", "Δεν ήταν δυνατή η αναπαραγωγή της αφήγησης. Έλεγξε ότι έχει ανέβει το αρχείο WAV στο GitHub Pages.", "🔈");
+      }
+    };
+
+    if (ariadneNarrationAudio) {
+      ariadneNarrationAudio.addEventListener("play", () => setAriadneNarrationState(true));
+      ariadneNarrationAudio.addEventListener("pause", () => setAriadneNarrationState(false));
+      ariadneNarrationAudio.addEventListener("ended", () => setAriadneNarrationState(false));
+      ariadneNarrationAudio.addEventListener("error", () => setAriadneNarrationState(false));
+    };
+
+    const l2QuizData = [
+      { q: "Ποιος βασιλιάς στην Κρήτη ζητούσε φόρο αίματος?", opts: ["Μίνωας", "Αιγέας", "Πιτθέας"], correct: 0 },
+      { q: "Ποιος βοήθησε τον Θησέα μέσα στον Λαβύρινθο?", opts: ["Η Αίθρα", "Η Αριάδνη", "Η Ελένη"], correct: 1 },
+      { q: "Τι του έδωσε η Αριάδνη για να μην χαθεί?", opts: ["Ένα χρυσό σπαθί", "Ένα χάρτη", "Ένα κουβάρι νήμα (Μίτος)"], correct: 2 }
+    ];
+    let l2UserAnswers = [null, null, null];
+
+    function renderLesson2Quiz() {
+      const box = document.getElementById('lesson2QuizBox');
+      if (!box) return;
+      box.innerHTML = "";
+      l2QuizData.forEach((q, qIdx) => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3";
+        let optsHtml = "";
+        q.opts.forEach((opt, oIdx) => {
+          const isSelected = l2UserAnswers[qIdx] === oIdx;
+          optsHtml += `<button onclick="answerL2Quiz(${qIdx}, ${oIdx})" class="w-full text-left p-2.5 rounded-lg border text-xs sm:text-sm ${isSelected ? 'bg-indigo-500 text-slate-950 font-bold border-indigo-400' : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'}">${opt}</button>`;
+        });
+        card.innerHTML = `<h4 class="font-bold text-indigo-300 text-sm">${q.q}</h4><div class="space-y-2">${optsHtml}</div>`;
+        box.appendChild(card);
+      });
+      const submitBtn = document.createElement('button');
+      submitBtn.onclick = () => {
+        let score = 0;
+        l2UserAnswers.forEach((ans, idx) => { if (ans === l2QuizData[idx].correct) score++; });
+        showModal("Αποτέλεσμα Αξιολόγησης", `Συγχαρητήρια! Πετύχατε ${score} / ${l2QuizData.length} σωστές απαντήσεις!`, "🏆");
+      };
+      submitBtn.className = "w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-sm custom-btn cursor-pointer";
+      submitBtn.innerText = "Υποβολή Αξιολόγησης";
+      box.appendChild(submitBtn);
+    }
+    window.answerL2Quiz = function(qIdx, oIdx) { l2UserAnswers[qIdx] = oIdx; renderLesson2Quiz(); };
+
+    const l3QuizData = [
+      { q: "Ποιο χρώμα πανιών ξέχασε να αλλάξει ο Θησέας?", opts: ["Λευκά", "Μαύρα", "Κόκκινα"], correct: 1 },
+      { q: "Ποιος θρήνησε πέφτοντας στη θάλασσα?", opts: ["Ο Αιγέας", "Ο Δίδαλος", "Ο Μίνωας"], correct: 0 },
+      { q: "Πώς ονομάστηκε η θάλασσα από τότε?", opts: ["Ιόνιο", "Αιγαίο", "Μεσόγειος"], correct: 1 }
+    ];
+    let l3UserAnswers = [null, null, null];
+
+    function renderLesson3Quiz() {
+      const box = document.getElementById('lesson3QuizBox');
+      if (!box) return;
+      box.innerHTML = "";
+      l3QuizData.forEach((q, qIdx) => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3";
+        let optsHtml = "";
+        q.opts.forEach((opt, oIdx) => {
+          const isSelected = l3UserAnswers[qIdx] === oIdx;
+          optsHtml += `<button onclick="answerL3Quiz(${qIdx}, ${oIdx})" class="w-full text-left p-2.5 rounded-lg border text-xs sm:text-sm ${isSelected ? 'bg-emerald-500 text-slate-950 font-bold border-emerald-400' : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'}">${opt}</button>`;
+        });
+        card.innerHTML = `<h4 class="font-bold text-emerald-300 text-sm">${q.q}</h4><div class="space-y-2">${optsHtml}</div>`;
+        box.appendChild(card);
+      });
+      const submitBtn = document.createElement('button');
+      submitBtn.onclick = () => {
+        let score = 0;
+        l3UserAnswers.forEach((ans, idx) => { if (ans === l3QuizData[idx].correct) score++; });
+        showModal("Αποτέλεσμα Αξιολόγησης", `Συγχαρητήρια! Πετύχατε ${score} / ${l3QuizData.length} σωστές απαντήσεις!`, "🏆");
+      };
+      submitBtn.className = "w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-sm custom-btn cursor-pointer";
+      submitBtn.innerText = "Υποβολή Αξιολόγησης";
+      box.appendChild(submitBtn);
+    }
+    window.answerL3Quiz = function(qIdx, oIdx) { l3UserAnswers[qIdx] = oIdx; renderLesson3Quiz(); };
+
+    const lesson2MazeLayout = [
+      "###############",
+      "#S#.........#.#",
+      "#.###.#####.#.#",
+      "#.....#...#.#.#",
+      "#########.#.#.#",
+      "#.#.......#...#",
+      "#.#.#.###.###.#",
+      "#...#.#.....#.#",
+      "#.###.###.###.#",
+      "#...#...#.#...#",
+      "###.###.###.###",
+      "#....E#.......#",
+      "###############"
+    ];
+    const lesson2MazeRoot = document.querySelector('.lesson2-maze-widget');
+    let lesson2MazePlayer = { x: 1, y: 1 };
+    let lesson2MazeSteps = 0;
+    const lesson2MazeThread = new Set();
+    let lesson2MazeWon = false;
+    const lesson2MazeGoal = { x: 5, y: 11 };
+
+    function drawLesson2Maze() {
+      if (!lesson2MazeRoot) return;
+      const grid = lesson2MazeRoot.querySelector('#lesson2MazeGrid');
+      grid.innerHTML = "";
+
+      lesson2MazeLayout.forEach((row, y) => {
+        [...row].forEach((character, x) => {
+          const cell = document.createElement('div');
+          cell.className = `maze-cell ${character === '#' ? 'maze-wall' : 'maze-floor'}`;
+          cell.setAttribute('role', 'gridcell');
+          if (character === 'S') cell.classList.add('maze-start');
+          if (character === 'E') {
+            cell.classList.add('maze-goal');
+            cell.setAttribute('aria-label', 'Πύλη εξόδου');
+          }
+
+          if (lesson2MazeThread.has(`${x},${y}`)) {
+            const thread = document.createElement('span');
+            thread.className = 'maze-thread';
+            thread.setAttribute('aria-hidden', 'true');
+            cell.appendChild(thread);
+          }
+
+          if (lesson2MazePlayer.x === x && lesson2MazePlayer.y === y) {
+            cell.classList.add('maze-player');
+            const actor = document.createElement('span');
+            actor.className = 'maze-actor';
+            actor.textContent = '🧑';
+            cell.appendChild(actor);
+          } else if (character === 'E') {
+            const goal = document.createElement('span');
+            goal.className = 'maze-actor';
+            goal.textContent = '🚪';
+            cell.appendChild(goal);
+          }
+
+          grid.appendChild(cell);
+        });
+      });
+
+      lesson2MazeRoot.querySelector('#lesson2MazeSteps').textContent = lesson2MazeSteps;
+    }
+
+    function moveLesson2MazePlayer(dx, dy) {
+      if (!lesson2MazeRoot || lesson2MazeWon) return;
+      const nextX = lesson2MazePlayer.x + dx;
+      const nextY = lesson2MazePlayer.y + dy;
+      const destination = lesson2MazeLayout[nextY]?.[nextX];
+      const message = lesson2MazeRoot.querySelector('#lesson2MazeMessage');
+
+      if (destination === undefined || destination === '#') {
+        message.textContent = '🧱 Εκεί υπάρχει τοίχος! Δοκίμασε άλλη διαδρομή.';
+        return;
+      }
+
+      lesson2MazePlayer = { x: nextX, y: nextY };
+      lesson2MazeThread.add(`${nextX},${nextY}`);
+      lesson2MazeSteps++;
+      drawLesson2Maze();
+
+      if (lesson2MazePlayer.x === lesson2MazeGoal.x && lesson2MazePlayer.y === lesson2MazeGoal.y) {
+        lesson2MazeWon = true;
+        message.textContent = 'Μπράβο! Βρήκες την έξοδο!';
+        lesson2MazeRoot.querySelector('#lesson2MazeOverlay').style.display = 'block';
+      } else {
+        message.textContent = 'Πολύ καλά! Συνέχισε να ακολουθείς τον μίτο.';
+      }
+    }
+
+    function initializeLesson2Maze() {
+      lesson2MazePlayer = { x: 1, y: 1 };
+      lesson2MazeSteps = 0;
+      lesson2MazeThread.clear();
+      lesson2MazeThread.add('1,1');
+      lesson2MazeWon = false;
+      if (!lesson2MazeRoot) return;
+      lesson2MazeRoot.querySelector('#lesson2MazeOverlay').style.display = 'none';
+      lesson2MazeRoot.querySelector('#lesson2MazeMessage').textContent = 'Χρησιμοποίησε τα βελάκια του πληκτρολογίου για να κινήσεις τον Θησέα.';
+      drawLesson2Maze();
+    }
+
+    if (lesson2MazeRoot) {
+      lesson2MazeRoot.querySelectorAll('[data-maze-move]').forEach(button => {
+        button.addEventListener('click', () => {
+          const [dx, dy] = button.dataset.mazeMove.split(',').map(Number);
+          moveLesson2MazePlayer(dx, dy);
+        });
+      });
+      lesson2MazeRoot.querySelectorAll('[data-maze-restart]').forEach(button => {
+        button.addEventListener('click', initializeLesson2Maze);
+      });
+      document.addEventListener('keydown', event => {
+        const lesson2 = document.getElementById('page-lesson2');
+        const activeTab = document.getElementById('l2-content-ariadne');
+        const isTyping = event.target instanceof HTMLElement
+          && (event.target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName));
+        if (!lesson2 || lesson2.classList.contains('hidden') || !activeTab || activeTab.classList.contains('hidden') || isTyping) return;
+
+        const keyMoves = {
+          ArrowUp: [0, -1], w: [0, -1],
+          ArrowDown: [0, 1], s: [0, 1],
+          ArrowLeft: [-1, 0], a: [-1, 0],
+          ArrowRight: [1, 0], d: [1, 0]
+        };
+        const movement = keyMoves[event.key] || keyMoves[event.key.toLowerCase()];
+        if (!movement) return;
+        event.preventDefault();
+        moveLesson2MazePlayer(...movement);
+      });
+      initializeLesson2Maze();
+    }
+
+    window.checkIcarusAns = function(isCorrect) {
+      const res = document.getElementById('icarusRes');
+      if (!res) return;
+      res.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-400', 'bg-rose-500/20', 'text-rose-400');
+      if (isCorrect) {
+        res.classList.add('bg-emerald-500/20', 'text-emerald-400');
+        res.innerText = "✨ Σωστό! Ο Ίκαρος πέταξε πολύ κοντά στον ήλιο και το κερί έλιωσε.";
+      } else {
+        res.classList.add('bg-rose-500/20', 'text-rose-400');
+        res.innerText = "❌ Λάθος! Ξαναπροσπάθησε.";
+      }
+    };
+
+    window.onload = function() {
+      showPage('home');
+    };
+  </script>
+</body>
+</html>
